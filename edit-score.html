@@ -38,6 +38,11 @@
             <div id="historyList" class="history-list"></div>
         </div>
         
+        <!-- 安装按钮 -->
+        <button id="installBtn" class="install-btn" style="display: none; margin-top: 20px;">
+            📱 安装应用到桌面
+        </button>
+        
         <p class="hint-text">这是一个独立页面，无法查看最新分数</p>
     </div>
     
@@ -143,7 +148,46 @@
             updateScore(currentScore.toString());
         }
         
-        // 6. 页面加载
+        // 6. 安装到桌面功能
+        let installPrompt;
+        const installBtn = document.getElementById('installBtn');
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('安装提示已触发');
+            e.preventDefault();
+            installPrompt = e;
+            installBtn.style.display = 'block';
+        });
+        
+        installBtn.addEventListener('click', async () => {
+            if (installPrompt) {
+                installPrompt.prompt();
+                const { outcome } = await installPrompt.userChoice;
+                
+                if (outcome === 'accepted') {
+                    console.log('用户接受了安装');
+                    installBtn.style.display = 'none';
+                }
+                installPrompt = null;
+            } else {
+                alert('安装功能暂不可用，请使用浏览器菜单中的"创建快捷方式"功能');
+            }
+        });
+        
+        // 7. 注册Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(registration => {
+                        console.log('SW注册成功:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('SW注册失败:', error);
+                    });
+            });
+        }
+        
+        // 8. 页面加载
         document.addEventListener('DOMContentLoaded', function() {
             showCurrentScore();
             showHistory();
@@ -167,15 +211,30 @@
                     quickAction(this.dataset.action);
                 });
             });
-        });
-        
-        // 7. 安装到桌面功能
-        let installPrompt;
-        
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            installPrompt = e;
+            
+            // 添加用户交互（触发PWA条件）
+            document.addEventListener('click', function() {
+                // 用户交互有助于满足PWA安装条件
+            });
         });
     </script>
+    
+    <style>
+        .install-btn {
+            padding: 12px 24px;
+            background: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .install-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+    </style>
 </body>
 </html>
