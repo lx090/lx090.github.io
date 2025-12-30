@@ -43,12 +43,7 @@
     <p style="font-size: 0.9em; margin-top: 30px;">从桌面图标打开可获得最佳体验</p>
     
     <script>
-        // 1. 修复Edge网址问题（精简版）
-        if (location.host === 'lx090.github.io' && !location.pathname.includes('/my-app')) {
-            location.replace('https://lx090.github.io/my-app/');
-        }
-        
-        // 2. 安装到桌面功能
+        // 1. 安装到桌面功能
         let installPrompt;
         const installBtn = document.getElementById('installBtn');
         
@@ -66,7 +61,7 @@
             }
         });
         
-        // 3. 注册Service Worker
+        // 2. 注册Service Worker
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/service-worker.js');
         }
