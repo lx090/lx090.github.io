@@ -5,48 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>我的学习助手</title>
     <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
     <meta name="theme-color" content="#4a90e2">
-    
-    <style>
-        /* ******** 只添加这3行 ******** */
-        html, body {
-            overscroll-behavior-y: contain;
-        }
-        /* ******** 添加结束 ******** */
-        
-        body {
-            font-family: sans-serif;
-            background: #4a90e2;
-            color: white;
-            margin: 0;
-            padding: 20px;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-        h1 { margin-bottom: 10px; }
-        p { margin: 5px 0; opacity: 0.9; }
-        button {
-            background: white;
-            color: #4a90e2;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 16px;
-            margin: 20px 0;
-            cursor: pointer;
-        }
-    </style>
 </head>
 <body>
     <h1>📱 学习助手</h1>
     <p>专为安卓手机打造的示例应用</p>
     <p>点击下方按钮安装到桌面</p>
     <button id="installBtn">添加到主屏幕</button>
-    <p style="font-size: 0.9em; margin-top: 30px;">从桌面图标打开可获得最佳体验</p>
+    <p class="hint-text">从桌面图标打开可获得最佳体验</p>
     
     <script>
         // 1. 安装到桌面功能
