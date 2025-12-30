@@ -1,61 +1,307 @@
-/* 防止滚动回弹效果 */
+/* 基础样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 html, body {
     overscroll-behavior-y: contain;
+    height: 100%;
+    overflow: auto;
+    -webkit-tap-highlight-color: transparent;
 }
 
-/* 页面基础样式 */
-body {
-    font-family: sans-serif;
-    background: #4a90e2;
-    color: white;
-    margin: 0;
+/* 页面主题色 */
+html[data-page="display"] {
+    --primary-color: #4a90e2;
+    --primary-light: #63b3ed;
+    --button-color: #357ae8;
+}
+
+html[data-page="edit"] {
+    --primary-color: #f39c12;
+    --primary-light: #e67e22;
+    --button-color: #d35400;
+}
+
+/* 容器 */
+.container {
+    max-width: 600px;
+    margin: 0 auto;
     padding: 20px;
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    text-align: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    color: white;
 }
 
-/* 标题样式 */
+/* 标题 */
 h1 {
-    margin-bottom: 10px;
+    font-size: 2em;
+    margin-bottom: 30px;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
-/* 段落样式 */
-p {
-    margin: 5px 0;
+h3 {
+    margin-bottom: 15px;
+    text-align: center;
     opacity: 0.9;
 }
 
-/* 提示文本样式 */
+/* 分数显示 */
+.score-display {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    padding: 40px 30px;
+    margin: 20px 0;
+    width: 100%;
+    max-width: 400px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.score-value {
+    font-size: 4em;
+    font-weight: bold;
+    margin: 10px 0;
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    color: white;
+}
+
+/* 当前分数显示 */
+.current-score {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 15px;
+    padding: 20px;
+    margin: 20px 0;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.current-score-value {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #ffd700;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.time-text {
+    font-size: 0.9em;
+    opacity: 0.8;
+    margin-top: 8px;
+}
+
+/* 输入区域 */
+.score-input {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 15px;
+    padding: 25px;
+    margin: 20px 0;
+    width: 100%;
+    max-width: 400px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+input[type="number"] {
+    padding: 16px 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    font-size: 18px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #333;
+    text-align: center;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+input[type="number"]:focus {
+    outline: none;
+    border-color: white;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+/* 按钮通用样式 */
+button {
+    padding: 16px 24px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    color: white;
+    background: var(--button-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    opacity: 0.95;
+}
+
+button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.update-btn {
+    background: #e74c3c;
+    font-size: 18px;
+}
+
+.refresh-btn {
+    background: #3498db;
+    max-width: 200px;
+    margin: 0 auto;
+}
+
+/* 快速操作 */
+.quick-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.quick-btn {
+    flex: 1;
+    padding: 12px;
+    font-size: 14px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* 刷新区域 */
+.refresh-section {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.hint {
+    opacity: 0.8;
+    font-size: 0.9em;
+    margin-top: 10px;
+}
+
+/* 历史记录 */
+.history-section {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 20px;
+    margin: 20px 0;
+    width: 100%;
+    max-width: 400px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.history-list {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 15px;
+    margin: 8px 0;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    border-left: 4px solid var(--button-color);
+}
+
+.history-score {
+    font-weight: bold;
+    color: #ffd700;
+}
+
+.history-time {
+    font-size: 0.9em;
+    opacity: 0.8;
+}
+
+.no-history {
+    text-align: center;
+    padding: 20px;
+    opacity: 0.7;
+    font-style: italic;
+}
+
+/* 提示文本 */
 .hint-text {
     font-size: 0.9em;
     margin-top: 30px;
+    opacity: 0.7;
+    text-align: center;
+    line-height: 1.5;
+    max-width: 400px;
 }
 
-/* 按钮样式 */
-button {
-    background: white;
-    color: #4a90e2;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 16px;
-    margin: 20px 0;
-    cursor: pointer;
-    transition: all 0.3s ease;
+/* 滚动条样式 */
+::-webkit-scrollbar {
+    width: 6px;
 }
 
-/* 按钮悬停效果 */
-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
 }
 
-/* 按钮激活效果 */
-button:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+/* 响应式设计 */
+@media (max-width: 600px) {
+    .container {
+        padding: 15px;
+    }
+    
+    h1 {
+        font-size: 1.6em;
+    }
+    
+    .score-value {
+        font-size: 3em;
+    }
+    
+    .current-score-value {
+        font-size: 2em;
+    }
+    
+    .score-display,
+    .current-score,
+    .score-input,
+    .history-section {
+        max-width: 100%;
+        padding: 20px 15px;
+    }
+    
+    .quick-actions {
+        flex-direction: column;
+    }
 }

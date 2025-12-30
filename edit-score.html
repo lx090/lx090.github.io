@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>修改分数 - 学习助手</title>
+    <link rel="manifest" href="manifest-b.json">
+    <link rel="stylesheet" href="style.css">
+    <meta name="theme-color" content="#f39c12">
+    <script>
+        document.documentElement.setAttribute('data-page', 'edit');
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>✏️ 修改分数</h1>
+        
+        <div class="current-score">
+            <p>当前分数: <span id="currentScore" class="current-score-value">0</span> 分</p>
+            <p id="currentTime" class="time-text"></p>
+        </div>
+        
+        <div class="score-input">
+            <div class="input-group">
+                <input type="number" id="scoreInput" placeholder="输入0-100之间的分数" min="0" max="100">
+                <button id="updateBtn" class="update-btn">更新分数</button>
+            </div>
+            
+            <div class="quick-actions">
+                <button class="quick-btn" data-action="plus5">+5分</button>
+                <button class="quick-btn" data-action="minus5">-5分</button>
+                <button class="quick-btn" data-action="reset">重置为0</button>
+            </div>
+        </div>
+        
+        <div class="history-section">
+            <h3>📝 修改记录</h3>
+            <div id="historyList" class="history-list"></div>
+        </div>
+        
+        <p class="hint-text">这是一个独立页面，无法查看最新分数</p>
+    </div>
+    
+    <script>
+        // 1. 显示当前分数
+        function showCurrentScore() {
+            const score = localStorage.getItem('study_score') || '0';
+            const time = localStorage.getItem('study_score_updated') || '';
+            
+            document.getElementById('currentScore').textContent = score;
+            document.getElementById('currentTime').textContent = time ? `更新时间: ${time}` : '';
+        }
+        
+        // 2. 显示历史记录
+        function showHistory() {
+            const history = JSON.parse(localStorage.getItem('score_history') || '[]');
+            const historyList = document.getElementById('historyList');
+            
+            if (history.length === 0) {
+                historyList.innerHTML = '<p class="no-history">暂无修改记录</p>';
+                return;
+            }
+            
+            let html = '';
+            history.slice(0, 5).forEach(item => { // 只显示最近5条
+                html += `<div class="history-item">
+                    <span class="history-score">${item.score}分</span>
+                    <span class="history-time">${item.time}</span>
+                </div>`;
+            });
+            
+            historyList.innerHTML = html;
+        }
+        
+        // 3. 保存分数和历史记录
+        function saveScore(newScore) {
+            const now = new Date();
+            const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+            const dateStr = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
+            const fullTime = `${dateStr} ${timeStr}`;
+            
+            // 保存当前分数
+            localStorage.setItem('study_score', newScore);
+            localStorage.setItem('study_score_updated', fullTime);
+            
+            // 保存历史记录
+            let history = JSON.parse(localStorage.getItem('score_history') || '[]');
+            history.unshift({ // 添加到开头
+                score: newScore,
+                time: fullTime
+            });
+            
+            // 只保留最近20条记录
+            if (history.length > 20) {
+                history = history.slice(0, 20);
+            }
+            
+            localStorage.setItem('score_history', JSON.stringify(history));
+            
+            // 触发storage事件，让A页面自动刷新
+            window.dispatchEvent(new StorageEvent('storage', {
+                key: 'study_score',
+                newValue: newScore
+            }));
+            
+            return fullTime;
+        }
+        
+        // 4. 更新分数
+        function updateScore(newScore) {
+            const scoreNum = parseInt(newScore);
+            if (isNaN(scoreNum) || scoreNum < 0 || scoreNum > 100) {
+                alert('请输入0-100之间的有效分数');
+                return false;
+            }
+            
+            const time = saveScore(newScore.toString());
+            
+            alert(`✅ 分数已更新为: ${newScore} 分\n更新时间: ${time}`);
+            document.getElementById('scoreInput').value = '';
+            showCurrentScore();
+            showHistory();
+            
+            return true;
+        }
+        
+        // 5. 快速操作
+        function quickAction(action) {
+            let currentScore = parseInt(localStorage.getItem('study_score') || '0');
+            
+            switch(action) {
+                case 'plus5':
+                    currentScore = Math.min(100, currentScore + 5);
+                    break;
+                case 'minus5':
+                    currentScore = Math.max(0, currentScore - 5);
+                    break;
+                case 'reset':
+                    currentScore = 0;
+                    break;
+            }
+            
+            updateScore(currentScore.toString());
+        }
+        
+        // 6. 页面加载
+        document.addEventListener('DOMContentLoaded', function() {
+            showCurrentScore();
+            showHistory();
+            
+            // 更新按钮
+            document.getElementById('updateBtn').addEventListener('click', function() {
+                const input = document.getElementById('scoreInput');
+                updateScore(input.value.trim());
+            });
+            
+            // Enter键提交
+            document.getElementById('scoreInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    updateScore(this.value.trim());
+                }
+            });
+            
+            // 快速操作按钮
+            document.querySelectorAll('.quick-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    quickAction(this.dataset.action);
+                });
+            });
+        });
+        
+        // 7. 安装到桌面功能
+        let installPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            installPrompt = e;
+        });
+    </script>
+</body>
+</html>

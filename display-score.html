@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>查看分数 - 学习助手</title>
+    <link rel="manifest" href="manifest-a.json">
+    <link rel="stylesheet" href="style.css">
+    <meta name="theme-color" content="#4a90e2">
+    <script>
+        document.documentElement.setAttribute('data-page', 'display');
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 当前分数</h1>
+        
+        <div class="score-display" id="scoreDisplay">
+            <div class="score-value">0 分</div>
+            <p id="lastUpdated">最后更新: 暂无记录</p>
+        </div>
+        
+        <div class="refresh-section">
+            <button id="refreshBtn" class="refresh-btn">🔄 刷新</button>
+            <p class="hint">自动刷新: <span id="timer">5</span>秒</p>
+        </div>
+        
+        <p class="hint-text">这是一个只读页面，无法修改分数</p>
+    </div>
+    
+    <script>
+        // 1. 显示分数
+        function showScore() {
+            const score = localStorage.getItem('study_score') || '0';
+            const lastUpdated = localStorage.getItem('study_score_updated') || '暂无记录';
+            
+            document.getElementById('scoreDisplay').innerHTML = `
+                <div class="score-value">${score} 分</div>
+                <p id="lastUpdated">最后更新: ${lastUpdated}</p>
+            `;
+        }
+        
+        // 2. 自动刷新倒计时
+        let countdown = 5;
+        let timerInterval;
+        
+        function startTimer() {
+            clearInterval(timerInterval);
+            countdown = 5;
+            
+            timerInterval = setInterval(() => {
+                countdown--;
+                document.getElementById('timer').textContent = countdown;
+                
+                if (countdown <= 0) {
+                    clearInterval(timerInterval);
+                    showScore(); // 刷新分数
+                    startTimer(); // 重新开始倒计时
+                }
+            }, 1000);
+        }
+        
+        // 3. 监听存储变化（当B页面修改分数时）
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'study_score' || e.key === 'study_score_updated') {
+                showScore();
+                clearInterval(timerInterval);
+                startTimer();
+            }
+        });
+        
+        // 4. 页面加载
+        document.addEventListener('DOMContentLoaded', function() {
+            showScore();
+            startTimer();
+            
+            // 手动刷新按钮
+            document.getElementById('refreshBtn').addEventListener('click', function() {
+                showScore();
+                clearInterval(timerInterval);
+                startTimer();
+            });
+        });
+        
+        // 5. 页面可见时刷新
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                showScore();
+                clearInterval(timerInterval);
+                startTimer();
+            }
+        });
+        
+        // 6. 安装到桌面功能
+        let installPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            installPrompt = e;
+        });
+    </script>
+</body>
+</html>
